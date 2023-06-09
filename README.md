@@ -42,7 +42,7 @@ The problem is only related to iOS (mainly safari, but other browsers on iOS see
 the safari behavior):
 
 - the opened kbd is always rendered "above" the viewport (the `interactive-widget=resizes-visual` meta viewport instruction seem not to be supported at the time of writing)
-- if the browser thinks the focused input is too close to the the viewport bottom it scrolls the window down regardless of any fixed layout elements
+- if the browser thinks the focused input is too close to the viewport bottom it scrolls the window down regardless of any fixed layout elements
 
 On Androids the `interactive-widget=resizes-visual` + the `--vh` trick combo seem to work fine.
 
@@ -63,5 +63,7 @@ window.addEventListener('ios_keyboard_maybe_open', () => {
 	window.scroll({ top: 0, behavior: 'instant' });
 });
 ```
+
+Tested on iPhone 13 mini, iOS 16.4 (Safari, Chrome, Brave).
 
 Test online [here](https://marian.meres.sk/chat-layout-demo/).

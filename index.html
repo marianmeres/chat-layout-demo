@@ -48,23 +48,6 @@
 				border: 0;
 			}
 		</style>
-		<script>
-			const is_ios = (ua = window?.navigator?.userAgent) => /iP(ad|od|hone)/i.test(ua);
-
-			const is_safari = (ua = window?.navigator?.userAgent) =>
-				/WebKit/i.test(ua) && !/(CriOS|FxiOS|OPiOS|mercury)/i.test(ua);
-
-			const is_ios_safari = (ua = window?.navigator?.userAgent) =>
-				is_ios(ua) && is_safari(ua);
-
-			const debounce = (callback, wait) => {
-				let tid = null;
-				return (...args) => {
-					tid && window.clearTimeout(tid);
-					tid = window.setTimeout(() => callback.apply(null, args), wait);
-				};
-			};
-		</script>
 	</head>
 	<body>
 		<div id="layout" class="vh100">
@@ -125,8 +108,8 @@
 					// const vh = `${height * 0.01}px`;
 					document.documentElement.style.setProperty('--vh', vh);
 
-					// ale least some empirical size hint do detect open kbd...
-					const KBD_HEIGHT_THRESHOLD = 200;
+					// ale least some empirical size hint...
+					const KBD_HEIGHT_EDUCATED_GUESS_THRESHOLD = 220;
 
 					// The problem (only related to iOS /mainly safari, but others seem to mimick/):
 					// - the opened kbd is always rendered "above" viewport (the `interactive-widget=resizes-visual`
@@ -138,7 +121,7 @@
 						iOS() &&
 						!isZoomed() &&
 						_previousHeight &&
-						_previousHeight - height >= KBD_HEIGHT_THRESHOLD
+						_previousHeight - height >= KBD_HEIGHT_EDUCATED_GUESS_THRESHOLD
 					) {
 						// let's just signal here something
 						window.dispatchEvent(new Event('ios_keyboard_maybe_open'));
