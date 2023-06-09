@@ -38,11 +38,11 @@ window.visualViewport.addEventListener('resize', () => {
 
 ## iOS Problem #2 - the scrolled viewport with opened virtual keyboard
 
-The problem is only related to iOS (mainly safari, but others browsers on iOS seem to mimick
+The problem is only related to iOS (mainly safari, but other browsers on iOS seem to mimick
 the safari behavior):
 
 - the opened kbd is always rendered "above" the viewport (the `interactive-widget=resizes-visual` meta viewport instruction seem not to be supported at the time of writing)
-- if iOS thinks the focused input is too close to the the viewport bottom it scrolls the window down regardless of any fixed layout elements
+- if the browser thinks the focused input is too close to the the viewport bottom it scrolls the window down regardless of any fixed layout elements
 
 On Androids the `interactive-widget=resizes-visual` + the `--vh` trick combo seem to work fine.
 
@@ -50,10 +50,8 @@ On Androids the `interactive-widget=resizes-visual` + the `--vh` trick combo see
 
 Scroll back to the top immediately. Unfortunately this is far from perfect. See [source](index.html) for more.
 
-The core idea:
-
 ```javascript
-// shortened
+// shortened, see index.html
 // ...from inside visualViewport change handler...
 if (iOS() && !isZoomed() && _previousHeight - height >= KBD_HEIGHT) {
 	window.dispatchEvent(new Event('ios_keyboard_maybe_open'));
@@ -65,3 +63,5 @@ window.addEventListener('ios_keyboard_maybe_open', () => {
 	window.scroll({ top: 0, behavior: 'instant' });
 });
 ```
+
+Test online [here](https://marian.meres.sk/chat-layout-demo/).

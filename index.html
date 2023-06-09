@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>"chat app like" layout demo</title>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, interactive-widget=resizes-visual"
+		/>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+			crossorigin="anonymous"
+		/>
+		<style>
+			:root {
+				--vh: 1dvh;
+			}
+			.vh100 {
+				height: calc(var(--vh, 1dvh) * 100);
+			}
+			body {
+				height: 100dvh;
+			}
+			#layout {
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+			header {
+				background: lightcoral;
+				padding: 1rem;
+			}
+			main {
+				overflow-y: auto;
+				padding: 1rem;
+				flex: 1;
+			}
+			main p {
+				margin-bottom: 2rem;
+			}
+			footer input {
+				display: block;
+				width: 100%;
+				padding: 1rem;
+				background: lightgray;
+				border: 0;
+			}
+		</style>
+		<script>
+			const is_ios = (ua = window?.navigator?.userAgent) => /iP(ad|od|hone)/i.test(ua);
+
+			const is_safari = (ua = window?.navigator?.userAgent) =>
+				/WebKit/i.test(ua) && !/(CriOS|FxiOS|OPiOS|mercury)/i.test(ua);
+
+			const is_ios_safari = (ua = window?.navigator?.userAgent) =>
+				is_ios(ua) && is_safari(ua);
+
+			const debounce = (callback, wait) => {
+				let tid = null;
+				return (...args) => {
+					tid && window.clearTimeout(tid);
+					tid = window.setTimeout(() => callback.apply(null, args), wait);
+				};
+			};
+		</script>
+	</head>
+	<body>
+		<div id="layout" class="vh100">
+			<header>header</header>
+			<main>
+				<input type="text" />
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<input type="text" />
+			</main>
+			<footer>
+				<input type="text" placeholder="Type here..." />
+			</footer>
+		</div>
+		<script>
+			// iife wrapped, so it's easier to copy+paste
+			(() => {
+				const iOS = () => /iP(ad|od|hone)/i.test(window.navigator.userAgent);
+
+				let _previousHeight;
+				const updateVh = () => {
+					const { height, scale } = window.visualViewport;
+
+					// for larger than tiny zooms (somewhere above ~1.1) it appears that iOS always
+					// scales down to 1 on input focus (and kbd open), for tiny ones does not appear to do so...
+					// so I'm hip shooting for some threshold here (not really sure if it has any benefit)
+					// point is try not to do any magic on zoomed viewport, as it all can only get worse
+					const isZoomed = () => scale > 1.1;
+
+					// original idea taken from https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
+					const vh = isZoomed() ? '1dvh' : `${height * 0.01}px`;
+					// const vh = `${height * 0.01}px`;
+					document.documentElement.style.setProperty('--vh', vh);
+
+					// ale least some empirical size hint do detect open kbd...
+					const KBD_HEIGHT_THRESHOLD = 200;
+
+					// The problem (only related to iOS /mainly safari, but others seem to mimick/):
+					// - the opened kbd is always rendered "above" viewport (the `interactive-widget=resizes-visual`
+					//   meta viewport instruction seem not to be supported at the time of writing)
+					// - if iOS thinks the focused input is too close to the the viewport bottom in the viewport it scrolls the
+					//   window down regardless of any fixed elements
+					// The solution: scroll back to the top immediately.
+					if (
+						iOS() &&
+						!isZoomed() &&
+						_previousHeight &&
+						_previousHeight - height >= KBD_HEIGHT_THRESHOLD
+					) {
+						// let's just signal here something
+						window.dispatchEvent(new Event('ios_keyboard_maybe_open'));
+					}
+
+					//
+					_previousHeight = height;
+				};
+
+				// update now
+				updateVh();
+
+				// listen on change (intentionally not debounced)
+				window.visualViewport.addEventListener('scroll', updateVh);
+				window.visualViewport.addEventListener('resize', updateVh);
+			})();
+
+			// ...and do the "fix"
+			window.addEventListener('ios_keyboard_maybe_open', () => {
+				window.scroll({ top: 0, behavior: 'instant' });
+			});
+		</script>
+	</body>
+</html>
